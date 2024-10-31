@@ -1,0 +1,8 @@
+{
+  "rootPath": ".",
+  "pause": true,
+  "silent": false,
+  "checkLogs": true,
+  "details": true,
+  "names": ["attack"]
+}

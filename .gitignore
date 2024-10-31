@@ -1,0 +1,6 @@
+.cache/
+bin/
+build/
+spine-cpp/
+vsbuild/
+include/json.hpp

@@ -1,0 +1,160 @@
+
+tx_ui_Thunderclouds.png
+size: 481,495
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+tx_lei_00000
+  rotate: false
+  xy: 2, 254
+  size: 92, 59
+  orig: 105, 175
+  offset: 9, 96
+  index: -1
+tx_lei_00002
+  rotate: false
+  xy: 385, 248
+  size: 92, 121
+  orig: 105, 175
+  offset: 9, 30
+  index: -1
+tx_lei_00003
+  rotate: false
+  xy: 387, 371
+  size: 92, 122
+  orig: 105, 175
+  offset: 9, 29
+  index: -1
+tx_lei_00004
+  rotate: true
+  xy: 122, 315
+  size: 87, 117
+  orig: 105, 175
+  offset: 14, 34
+  index: -1
+tx_lei_00005
+  rotate: true
+  xy: 260, 406
+  size: 87, 125
+  orig: 105, 175
+  offset: 14, 33
+  index: -1
+tx_lei_00006
+  rotate: false
+  xy: 2, 124
+  size: 87, 122
+  orig: 105, 175
+  offset: 14, 36
+  index: -1
+tx_lei_00007
+  rotate: false
+  xy: 385, 132
+  size: 91, 114
+  orig: 105, 175
+  offset: 8, 37
+  index: -1
+tx_lei_00008
+  rotate: false
+  xy: 279, 61
+  size: 91, 66
+  orig: 105, 175
+  offset: 8, 85
+  index: -1
+tx_lei_00010
+  rotate: true
+  xy: 132, 404
+  size: 89, 126
+  orig: 105, 175
+  offset: 10, 20
+  index: -1
+tx_lei_00011
+  rotate: true
+  xy: 2, 404
+  size: 89, 128
+  orig: 105, 175
+  offset: 10, 18
+  index: -1
+tx_lei_00012
+  rotate: true
+  xy: 260, 315
+  size: 89, 123
+  orig: 105, 175
+  offset: 10, 23
+  index: -1
+tx_lei_00013
+  rotate: false
+  xy: 2, 2
+  size: 92, 120
+  orig: 105, 175
+  offset: 9, 22
+  index: -1
+tx_lei_00014
+  rotate: false
+  xy: 96, 10
+  size: 92, 116
+  orig: 105, 175
+  offset: 9, 26
+  index: -1
+tx_lei_00015
+  rotate: false
+  xy: 180, 130
+  size: 92, 116
+  orig: 105, 175
+  offset: 9, 26
+  index: -1
+tx_lei_00016
+  rotate: false
+  xy: 96, 256
+  size: 92, 57
+  orig: 105, 175
+  offset: 9, 85
+  index: -1
+tx_lei_00017
+  rotate: false
+  xy: 91, 128
+  size: 87, 118
+  orig: 105, 175
+  offset: 14, 35
+  index: -1
+tx_lei_00018
+  rotate: true
+  xy: 2, 315
+  size: 87, 118
+  orig: 105, 175
+  offset: 14, 34
+  index: -1
+tx_lei_00019
+  rotate: false
+  xy: 190, 14
+  size: 87, 113
+  orig: 105, 175
+  offset: 14, 39
+  index: -1
+tx_lei_00020
+  rotate: false
+  xy: 384, 20
+  size: 91, 110
+  orig: 105, 175
+  offset: 8, 38
+  index: -1
+tx_lei_00021
+  rotate: true
+  xy: 274, 222
+  size: 91, 109
+  orig: 105, 175
+  offset: 8, 39
+  index: -1
+tx_lei_00022
+  rotate: true
+  xy: 274, 129
+  size: 91, 108
+  orig: 105, 175
+  offset: 8, 41
+  index: -1
+tx_lei_00023
+  rotate: false
+  xy: 279, 4
+  size: 89, 55
+  orig: 105, 175
+  offset: 10, 91
+  index: -1
