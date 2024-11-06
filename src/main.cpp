@@ -5,8 +5,14 @@
 #include <exception>
 #include <spine/Animation.h>
 #include <spine/Atlas.h>
+#include <spine/Attachment.h>
+#include <spine/Bone.h>
+#include <spine/BoneData.h>
+#include <spine/Skeleton.h>
 #include <spine/SkeletonBinary.h>
 #include <spine/SkeletonData.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
 #include <spine/Vector.h>
 
 #include <cstdlib>
@@ -24,8 +30,14 @@ struct SpineFiles {
     std::string parentFolder;
 };
 
+struct SpineBoneSlotFiles {
+    std::vector<std::string> bones;
+    std::vector<std::string> slots;
+};
+
 nlohmann::json config;
 std::vector<std::string> validAnimationNames;
+
 Logs* logs = new Logs();
 
 spine::SpineExtension* spine::getDefaultExtension() {
@@ -71,6 +83,43 @@ std::vector<std::string> GetInvalidAnimationNames(spine::SkeletonData* data) {
     return res;
 }
 
+SpineBoneSlotFiles GetInvaildBoneSlotDatas(spine::SkeletonData* data) {
+    SpineBoneSlotFiles result;
+    std::vector<std::string> boneRes;
+    std::vector<std::string> soltRes;
+    spine::Skeleton* sk = new spine::Skeleton(data);
+    spine::Vector<spine::Bone*> bones = sk->getBones();
+    for (int i = 0; i < bones.size(); i++) {
+        spine::Bone* bone = bones[i];
+        std::string name = bone->getData().getName().buffer();
+        boneRes.push_back(name);
+        // std::cout << "bone name:" << name << std::endl;
+        // std::cout << "Bone position: (" << bone->getX() << ", " << bone->getY() << ", " << bone->getRotation() << ")" << std::endl;
+    }
+
+    spine::Vector<spine::Slot*> slots = sk->getSlots();
+    // std::vector<spine::Slot*> slots = sk->getSlots();
+    for (int v = 0; v < slots.size(); v++) {
+        spine::Slot* slot = slots[v];
+        std::string soltName = slot->getData().getName().buffer();
+
+        if (config["logHasAttachmentSlot"].get<bool>()) {
+            spine::Attachment* attachment = slot->getAttachment();
+            if (attachment) {
+                soltRes.push_back(soltName);
+                // std::cout << "Slot: " << slot->getData().getName().buffer() << " - Attachment: " << attachment->getName().buffer() << std::endl;
+            }
+        } else {
+            soltRes.push_back(soltName);
+        }
+        // std::cout << "Slot: " << slot->getData().getName().buffer() << std::endl;
+        // 如果只要查看插槽里面有数据的插槽 就用下面的方法
+    }
+    result.bones = boneRes;
+    result.slots = soltRes;
+    return result;
+}
+
 void findFiles(const fs::path& dir, std::vector<SpineFiles>& allSpineFiles) {
     logs->log("Searching for spine files in folder: " + dir.string());
     SpineFiles spineFiles;
@@ -79,7 +128,7 @@ void findFiles(const fs::path& dir, std::vector<SpineFiles>& allSpineFiles) {
         if (entry.is_directory()) {
             findFiles(entry.path(), allSpineFiles);
         } else {
-            if (entry.path().extension() == ".txt" && entry.path().string().find(".atlas.txt") != std::string::npos) {
+            if ((entry.path().extension() == ".txt" && entry.path().string().find(".atlas.txt") != std::string::npos) || entry.path().extension() == ".atlas") {
                 spineFiles.atlasPath = entry.path().string();
                 spineFiles.parentFolder = entry.path().parent_path().string();
             } else if (entry.path().extension() == ".skel") {
@@ -93,18 +142,43 @@ void findFiles(const fs::path& dir, std::vector<SpineFiles>& allSpineFiles) {
     }
 }
 
-bool WriteInvalidAnimationsToFile(const std::vector<SpineFiles>& allSpineFiles) {
+std::ofstream GetOutFile(std::string fileName) {
     std::ostringstream filename;
-    filename << "invalid_animations_" << Utils::get_current_time_str() << ".txt";
+    filename << fileName << Utils::get_current_time_str() << ".txt";
     std::ofstream outFile(filename.str());
+    if (!outFile) {
+        logs->error("Failed to create invalid animations output file");
+        return nullptr;
+    }
+    return outFile;
+}
+
+bool WriteInvalidAnimationsToFile(const std::vector<SpineFiles>& allSpineFiles) {
+    // std::ostringstream filename;
+    // filename << "invalid_animations_" << Utils::get_current_time_str() << ".txt";
+    std::ofstream outFile = GetOutFile("invalid_animations_");
     if (!outFile) {
         logs->error("Failed to create invalid animations output file");
         return false;
     }
+
+    std::ofstream boneOutFile = GetOutFile("invalid_bones_");
+    if (!boneOutFile) {
+        logs->error("Failed to create invalid bones output file");
+        return false;
+    }
+
+    std::ofstream slotOutFile = GetOutFile("invalid_solts_");
+    if (!boneOutFile) {
+        logs->error("Failed to create invalid solts output file");
+        return false;
+    }
+
     for (const auto& spineFile : allSpineFiles) {
         spine::SkeletonData* data = LoadSpine(spineFile.atlasPath.c_str(), spineFile.skelPath.c_str());
         if (data != nullptr) {
             std::vector<std::string> res = GetInvalidAnimationNames(data);
+            SpineBoneSlotFiles boneSlotRes = GetInvaildBoneSlotDatas(data);
             if (!res.empty()) {
                 outFile << "Folder name: " << spineFile.parentFolder << std::endl;
                 outFile << "Invalid animation names:" << std::endl;
@@ -113,6 +187,24 @@ bool WriteInvalidAnimationsToFile(const std::vector<SpineFiles>& allSpineFiles) 
                 }
                 outFile << std::endl;
             }
+            if (!boneSlotRes.bones.empty()) {
+                boneOutFile << "==============================" << std::endl;
+                boneOutFile << "Folder name: " << spineFile.parentFolder << std::endl;
+                boneOutFile << "Invalid bones names:" << std::endl;
+                for (const auto& name : boneSlotRes.bones) {
+                    boneOutFile << name << std::endl;
+                }
+                boneOutFile << std::endl;
+            }
+            if (!boneSlotRes.slots.empty()) {
+                slotOutFile << "==============================" << std::endl;
+                slotOutFile << "Folder name: " << spineFile.parentFolder << std::endl;
+                slotOutFile << "Invalid slot names:" << std::endl;
+                for (const auto& name : boneSlotRes.slots) {
+                    slotOutFile << name << std::endl;
+                }
+                slotOutFile << std::endl;
+            }
             delete data;
         } else {
             outFile << "Failed to load Skeleton data from path: " << spineFile.skelPath << std::endl;
@@ -120,6 +212,8 @@ bool WriteInvalidAnimationsToFile(const std::vector<SpineFiles>& allSpineFiles) 
         }
     }
     outFile.close();
+    boneOutFile.close();
+    slotOutFile.close();
     return true;
 }
 
@@ -154,7 +248,7 @@ bool WriteDetailsToFile(const std::vector<SpineFiles>& allSpineFiles) {
 }
 
 int main(int argc, char** argv) {
-    nlohmann::json config = LoadConfig();
+    config = LoadConfig();
     if (nullptr == config) {
         system("pause");
         return -1;

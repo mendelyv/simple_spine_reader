@@ -4,5 +4,8 @@
   "silent": false,
   "checkLogs": true,
   "details": true,
-  "names": ["attack"]
+  "logHasAttachmentSlot": false,
+  "names": [
+    "attack"
+  ]
 }
