@@ -30,7 +30,7 @@ struct SpineFiles {
     std::string parentFolder;
 };
 
-struct SpineBoneSlotFiles {
+struct SpineBoneSlotNames {
     std::vector<std::string> bones;
     std::vector<std::string> slots;
 };
@@ -83,8 +83,8 @@ std::vector<std::string> GetInvalidAnimationNames(spine::SkeletonData* data) {
     return res;
 }
 
-SpineBoneSlotFiles GetInvaildBoneSlotDatas(spine::SkeletonData* data) {
-    SpineBoneSlotFiles result;
+SpineBoneSlotNames GetBoneSlotNames(spine::SkeletonData* data) {
+    SpineBoneSlotNames result;
     std::vector<std::string> boneRes;
     std::vector<std::string> soltRes;
     spine::Skeleton* sk = new spine::Skeleton(data);
@@ -148,7 +148,6 @@ std::ofstream GetOutFile(std::string fileName) {
     std::ofstream outFile(filename.str());
     if (!outFile) {
         logs->error("Failed to create invalid animations output file");
-        return nullptr;
     }
     return outFile;
 }
@@ -162,23 +161,11 @@ bool WriteInvalidAnimationsToFile(const std::vector<SpineFiles>& allSpineFiles) 
         return false;
     }
 
-    std::ofstream boneOutFile = GetOutFile("invalid_bones_");
-    if (!boneOutFile) {
-        logs->error("Failed to create invalid bones output file");
-        return false;
-    }
-
-    std::ofstream slotOutFile = GetOutFile("invalid_solts_");
-    if (!boneOutFile) {
-        logs->error("Failed to create invalid solts output file");
-        return false;
-    }
-
     for (const auto& spineFile : allSpineFiles) {
         spine::SkeletonData* data = LoadSpine(spineFile.atlasPath.c_str(), spineFile.skelPath.c_str());
         if (data != nullptr) {
             std::vector<std::string> res = GetInvalidAnimationNames(data);
-            SpineBoneSlotFiles boneSlotRes = GetInvaildBoneSlotDatas(data);
+            SpineBoneSlotNames boneSlotRes = GetBoneSlotNames(data);
             if (!res.empty()) {
                 outFile << "Folder name: " << spineFile.parentFolder << std::endl;
                 outFile << "Invalid animation names:" << std::endl;
@@ -187,24 +174,6 @@ bool WriteInvalidAnimationsToFile(const std::vector<SpineFiles>& allSpineFiles) 
                 }
                 outFile << std::endl;
             }
-            if (!boneSlotRes.bones.empty()) {
-                boneOutFile << "==============================" << std::endl;
-                boneOutFile << "Folder name: " << spineFile.parentFolder << std::endl;
-                boneOutFile << "Invalid bones names:" << std::endl;
-                for (const auto& name : boneSlotRes.bones) {
-                    boneOutFile << name << std::endl;
-                }
-                boneOutFile << std::endl;
-            }
-            if (!boneSlotRes.slots.empty()) {
-                slotOutFile << "==============================" << std::endl;
-                slotOutFile << "Folder name: " << spineFile.parentFolder << std::endl;
-                slotOutFile << "Invalid slot names:" << std::endl;
-                for (const auto& name : boneSlotRes.slots) {
-                    slotOutFile << name << std::endl;
-                }
-                slotOutFile << std::endl;
-            }
             delete data;
         } else {
             outFile << "Failed to load Skeleton data from path: " << spineFile.skelPath << std::endl;
@@ -212,8 +181,6 @@ bool WriteInvalidAnimationsToFile(const std::vector<SpineFiles>& allSpineFiles) 
         }
     }
     outFile.close();
-    boneOutFile.close();
-    slotOutFile.close();
     return true;
 }
 
@@ -229,6 +196,7 @@ bool WriteDetailsToFile(const std::vector<SpineFiles>& allSpineFiles) {
         spine::SkeletonData* data = LoadSpine(spineFile.atlasPath.c_str(), spineFile.skelPath.c_str());
         if (data != nullptr) {
             spine::Vector<spine::Animation*> _animations = data->getAnimations();
+            outFile << "==============================" << std::endl;
             outFile << "Folder name: " << spineFile.parentFolder << std::endl;
             outFile << "Animation names:" << std::endl;
             for (int i = 0; i < _animations.size(); i++) {
@@ -236,6 +204,26 @@ bool WriteDetailsToFile(const std::vector<SpineFiles>& allSpineFiles) {
                 spine::String name = anim->getName();
                 outFile << name.buffer() << std::endl;
             }
+            outFile << std::endl;
+
+            SpineBoneSlotNames boneSlotRes = GetBoneSlotNames(data);
+            if (!boneSlotRes.bones.empty()) {
+                outFile << "bone names:" << std::endl;
+                for(int i = 0; i < boneSlotRes.bones.size(); i++) {
+                    std::string bone = boneSlotRes.bones[i];
+                    outFile << bone << std::endl;
+                }
+                outFile << std::endl;
+            }
+
+            if(!boneSlotRes.slots.empty()) {
+                outFile << "slot names:" << std::endl;
+                for(int i = 0; i < boneSlotRes.slots.size(); i++) {
+                    std::string slot = boneSlotRes.slots[i];
+                    outFile << slot << std::endl;
+                }
+            }
+            outFile << "==============================" << std::endl;
             outFile << std::endl;
             delete data;
         } else {

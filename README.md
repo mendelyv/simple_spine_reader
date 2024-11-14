@@ -20,6 +20,7 @@
         "silent": false, --静默执行
         "checkLogs": true, --输出log文件
         "details": true, --输出spine细节文件
+        "logHasAttachmentSlot", --只输出有数据的插槽
         "names": ["attack"] --动画名称白名单
       }
       ```
